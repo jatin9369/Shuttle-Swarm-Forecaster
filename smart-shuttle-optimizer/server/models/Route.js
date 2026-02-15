@@ -15,6 +15,13 @@ const RouteSchema = new mongoose.Schema({
         enum: ['planned', 'active', 'completed'],
         default: 'planned'
     },
+    isDynamic: {
+        type: Boolean,
+        default: false
+    },
+    reason: {
+        type: String // e.g., "Demand spike at Hospital"
+    },
     assignedIntents: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'RiderIntent'

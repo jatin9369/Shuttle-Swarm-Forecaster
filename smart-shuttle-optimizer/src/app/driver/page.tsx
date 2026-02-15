@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { io } from 'socket.io-client';
 import { Loader2, Zap, Map as MapIcon, Users, Bus, LogOut, Phone, Send, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,12 +19,21 @@ export default function DriverPage() {
         // Simulate auth check or redirect
         const token = localStorage.getItem('token');
         if (!token) {
-            // For demo purposes, we might allow bypassing if specifically testing driver view, 
-            // but standard flow requires login. 
-            // Let's assume user logs in as driver. 
             router.push('/login');
         }
         fetchRoutes();
+
+        // Socket Listen for Route Suggestions
+        const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000');
+        socket.on('routeSuggestion', (suggestion) => {
+            if (suggestion.type === 'DYNAMIC_ROUTE') {
+                alert(`🚍 New Route Suggestion!\n\nReason: ${suggestion.reason}\nVia: ${suggestion.name}\n\nCheck your route map!`);
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const fetchRoutes = async () => {

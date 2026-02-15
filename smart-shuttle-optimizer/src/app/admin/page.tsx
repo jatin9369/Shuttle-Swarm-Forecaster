@@ -4,9 +4,20 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { io } from 'socket.io-client';
-import { Loader2, Zap, Map as MapIcon, Users, Bus, LogOut, Settings, BarChart3, TrendingUp, X, QrCode, Database } from 'lucide-react';
+import { Loader2, Zap, Map as MapIcon, Users, Bus, LogOut, Settings, BarChart3, TrendingUp, X, QrCode, Database, AlertTriangle, CloudRain, Calendar, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const Map = dynamic(() => import('@/app/components/Map'), {
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-slate-800 animate-pulse rounded-xl" />
+});
+
+const LiveTrafficMap = dynamic(() => import('@/app/components/LiveTrafficMap'), {
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-slate-800 animate-pulse rounded-xl" />
+});
 
 export default function AdminPage() {
     const router = useRouter();
@@ -23,11 +34,13 @@ export default function AdminPage() {
     const [optimizing, setOptimizing] = useState(false);
     const [activeView, setActiveView] = useState('dashboard'); // dashboard, users, stops, settings
     const [showRawData, setShowRawData] = useState(false);
+    const [useGoogleMaps, setUseGoogleMaps] = useState(false); // Map Type Toggle
 
     // Modals state
     const [showAddUserModal, setShowAddUserModal] = useState(false);
     const [newUserCallback, setNewUserCallback] = useState({ name: '', email: '', password: '', role: 'rider' });
     const [qrModal, setQrModal] = useState<{ show: boolean, stopName: string, qrData: string } | null>(null);
+    const [suggestionModal, setSuggestionModal] = useState<{ show: boolean, data: any } | null>(null);
 
     // Mock data for charts
     const [hourlyData, setHourlyData] = useState([
@@ -59,6 +72,10 @@ export default function AdminPage() {
             setRoutes(newRoutes);
             setStats(prev => ({ ...prev, activeRoutes: newRoutes.length }));
             fetchData();
+        });
+
+        socket.on('routeSuggestion', (suggestion) => {
+            setSuggestionModal({ show: true, data: suggestion });
         });
 
         return () => {
@@ -109,6 +126,15 @@ export default function AdminPage() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         router.push('/login');
+    };
+
+    const handleEmergencyMsg = async (type: 'rain' | 'event') => {
+        try {
+            await api.post('/routes/emergency', { type });
+            alert(`🚨 Emergency Mode Activated: ${type.toUpperCase()}\n\nAI Engine is rerouting all buses...`);
+        } catch (err) {
+            alert("Failed to trigger emergency mode");
+        }
     };
 
     const handleOptimize = async () => {
@@ -237,6 +263,48 @@ export default function AdminPage() {
                 </div>
             )}
 
+            {suggestionModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-[#111625] border border-neon-green/30 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative neon-border-green">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Zap className="text-neon-green animate-pulse" />
+                            <h2 className="text-xl font-bold text-white">AI Route Suggestion</h2>
+                        </div>
+
+                        <div className="bg-white/5 p-4 rounded-xl mb-6">
+                            <h3 className="text-lg font-bold text-neon-blue mb-2">{suggestionModal.data.name}</h3>
+                            <p className="text-gray-300 mb-2">{suggestionModal.data.reason}</p>
+                            <div className="flex gap-2">
+                                <span className="px-2 py-1 bg-green-500/20 text-neon-green text-xs rounded border border-green-500/30">
+                                    Priority: {suggestionModal.data.priority}
+                                </span>
+                                <span className="px-2 py-1 bg-blue-500/20 text-neon-blue text-xs rounded border border-blue-500/30">
+                                    Savings: {suggestionModal.data.estimatedTimeSaving}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setSuggestionModal(null)}
+                                className="px-4 py-2 hover:bg-white/10 rounded-lg text-gray-400 font-bold transition-colors"
+                            >
+                                Dismiss
+                            </button>
+                            <button
+                                onClick={() => {
+                                    alert('Route approved and dispatched to drivers!');
+                                    setSuggestionModal(null);
+                                }}
+                                className="px-6 py-2 bg-neon-green text-black rounded-lg font-bold hover:shadow-[0_0_15px_#00ff9d] transition-all"
+                            >
+                                Approve & Dispatch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Sidebar */}
             <div className="w-64 bg-slate-950/50 border-r border-white/5 flex flex-col hidden md:flex">
                 <div className="p-6">
@@ -309,6 +377,47 @@ export default function AdminPage() {
                                 </>
                             )}
                         </button>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleEmergencyMsg('rain')}
+                                className="p-3 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 border border-blue-500/30 transition-all"
+                                title="Simulate Rain Emergency"
+                            >
+                                <CloudRain size={20} />
+                            </button>
+                            <button
+                                onClick={() => handleEmergencyMsg('event')}
+                                className="p-3 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 border border-purple-500/30 transition-all"
+                                title="Simulate Event Spike"
+                            >
+                                <Calendar size={20} />
+                            </button>
+                        </div>
+
+                        <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
+
+                        {/* Map Toggle */}
+                        <div className="flex bg-slate-800 p-1 rounded-lg border border-white/5">
+                            <button
+                                onClick={() => setUseGoogleMaps(false)}
+                                className={cn(
+                                    "p-2 rounded-md transition-all flex items-center gap-2 text-xs font-medium",
+                                    !useGoogleMaps ? "bg-neon-blue text-black shadow-lg shadow-neon-blue/20" : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                <MapIcon size={14} /> Standard
+                            </button>
+                            <button
+                                onClick={() => setUseGoogleMaps(true)}
+                                className={cn(
+                                    "p-2 rounded-md transition-all flex items-center gap-2 text-xs font-medium",
+                                    useGoogleMaps ? "bg-neon-blue text-black shadow-lg shadow-neon-blue/20" : "text-gray-400 hover:text-white"
+                                )}
+                            >
+                                <Globe size={14} /> Google Live
+                            </button>
+                        </div>
                     </header>
 
                     {activeView === 'dashboard' && (
@@ -339,37 +448,30 @@ export default function AdminPage() {
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Analytics Chart */}
-                                <div className="bg-[#111625] rounded-2xl border border-white/5 shadow-xl p-6">
-                                    <h2 className="font-bold text-lg mb-6 flex items-center gap-2">
-                                        <TrendingUp className="text-neon-blue" size={20} />
-                                        Demand Forecast
-                                    </h2>
-                                    <div className="h-[300px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={hourlyData}>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                                                <XAxis dataKey="name" stroke="#6b7280" />
-                                                <YAxis stroke="#6b7280" />
-                                                <Tooltip
-                                                    contentStyle={{ backgroundColor: '#0a0e17', border: '1px solid #1f2937', borderRadius: '8px' }}
-                                                    itemStyle={{ color: '#fff' }}
-                                                />
-                                                <Line type="monotone" dataKey="uv" stroke="#00f3ff" strokeWidth={3} dot={{ fill: '#0a0e17', stroke: '#00f3ff', strokeWidth: 2, r: 4 }} activeDot={{ r: 8, fill: '#00f3ff' }} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                {/* Main Map Widget */}
+                                <div className="lg:col-span-2 bg-card rounded-xl border border-white/10 p-1 overflow-hidden h-[500px] relative group">
+                                    <div className="absolute top-4 right-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+                                        <span className="relative flex h-3 w-3">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                        </span>
+                                        <span className="text-xs font-medium text-white">Live Traffic</span>
                                     </div>
+                                    {useGoogleMaps ? (
+                                        <LiveTrafficMap intents={intents} routes={routes} stops={stops} />
+                                    ) : (
+                                        <Map intents={intents} routes={routes} stops={stops} />
+                                    )}
                                 </div>
-
                                 {/* Heatmap / Live Demand */}
-                                <div className="bg-[#111625] rounded-2xl border border-white/5 shadow-xl overflow-hidden flex flex-col">
+                                <div className="bg-[#111625] rounded-2xl border border-white/5 shadow-xl overflow-hidden flex flex-col h-[400px]">
                                     <div className="p-6 border-b border-white/5">
                                         <h2 className="font-bold text-lg flex items-center gap-2">
                                             <Zap className="text-neon-green" size={20} />
                                             Live Demand Clustering
                                         </h2>
                                     </div>
-                                    <div className="p-0 flex-1 overflow-y-auto max-h-[300px]">
+                                    <div className="p-0 flex-1 overflow-y-auto">
                                         {intents.length === 0 ? (
                                             <div className="p-8 text-center text-gray-500 flex flex-col items-center">
                                                 <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
@@ -392,6 +494,11 @@ export default function AdminPage() {
                                                                 <div className="text-xs text-gray-500 mt-1">
                                                                     {new Date(intent.requestedTime).toLocaleTimeString()} • ID: {intent._id.slice(-4)}
                                                                 </div>
+                                                                {intent.riderScore && (
+                                                                    <div className="text-[10px] text-blue-400 mt-1">
+                                                                        Score: {intent.riderScore.toFixed(2)}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className={cn("px-3 py-1 rounded-full border text-xs font-bold", getHeatmapColor(intent.passengers))}>

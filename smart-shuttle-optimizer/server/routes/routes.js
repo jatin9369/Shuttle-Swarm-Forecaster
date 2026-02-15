@@ -16,6 +16,14 @@ router.post('/optimize', authMiddleware, routeController.triggerOptimization);
 // @route   POST api/routes/assign
 // @desc    Assign driver
 // @access  Private (Admin)
+// @route   POST api/routes/assign
+// @desc    Assign driver
+// @access  Private (Admin)
 router.post('/assign', authMiddleware, routeController.assignDriver);
+
+// @route   POST api/routes/emergency
+// @desc    Trigger emergency reroute
+// @access  Private (Admin)
+router.post('/emergency', authMiddleware, routeController.triggerEmergency);
 
 module.exports = router;

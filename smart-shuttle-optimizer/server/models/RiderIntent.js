@@ -31,6 +31,14 @@ const RiderIntentSchema = new mongoose.Schema({
     },
     deviceFingerprint: {
         type: String // To prevent spam if anonymous
+    },
+    riderScore: {
+        type: Number,
+        default: 1.0
+    },
+    isPredicted: {
+        type: Boolean,
+        default: false
     }
 });
 
