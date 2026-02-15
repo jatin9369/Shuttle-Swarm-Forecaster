@@ -14,10 +14,7 @@ const Map = dynamic(() => import('@/app/components/Map'), {
     loading: () => <div className="h-full w-full bg-slate-800 animate-pulse rounded-xl" />
 });
 
-const LiveTrafficMap = dynamic(() => import('@/app/components/LiveTrafficMap'), {
-    ssr: false,
-    loading: () => <div className="h-full w-full bg-slate-800 animate-pulse rounded-xl" />
-});
+
 
 export default function AdminPage() {
     const router = useRouter();
@@ -338,6 +335,18 @@ export default function AdminPage() {
                     >
                         <Settings size={18} /> Settings
                     </button>
+                    <button
+                        onClick={() => router.push('/admin/reports')}
+                        className="w-full text-left rounded-lg p-3 transition-all flex items-center gap-3 hover:bg-white/5 text-gray-400"
+                    >
+                        <BarChart3 size={18} /> Reports
+                    </button>
+                    <button
+                        onClick={() => router.push('/admin/optimization')}
+                        className="w-full text-left rounded-lg p-3 transition-all flex items-center gap-3 hover:bg-white/5 text-gray-400"
+                    >
+                        <Zap size={18} /> Smart Capacity
+                    </button>
                 </nav>
                 <div className="p-6">
                     <button
@@ -397,27 +406,7 @@ export default function AdminPage() {
 
                         <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
 
-                        {/* Map Toggle */}
-                        <div className="flex bg-slate-800 p-1 rounded-lg border border-white/5">
-                            <button
-                                onClick={() => setUseGoogleMaps(false)}
-                                className={cn(
-                                    "p-2 rounded-md transition-all flex items-center gap-2 text-xs font-medium",
-                                    !useGoogleMaps ? "bg-neon-blue text-black shadow-lg shadow-neon-blue/20" : "text-gray-400 hover:text-white"
-                                )}
-                            >
-                                <MapIcon size={14} /> Standard
-                            </button>
-                            <button
-                                onClick={() => setUseGoogleMaps(true)}
-                                className={cn(
-                                    "p-2 rounded-md transition-all flex items-center gap-2 text-xs font-medium",
-                                    useGoogleMaps ? "bg-neon-blue text-black shadow-lg shadow-neon-blue/20" : "text-gray-400 hover:text-white"
-                                )}
-                            >
-                                <Globe size={14} /> Google Live
-                            </button>
-                        </div>
+                        {/* Map Toggle Removed */}
                     </header>
 
                     {activeView === 'dashboard' && (
@@ -448,20 +437,21 @@ export default function AdminPage() {
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Main Map Widget */}
-                                <div className="lg:col-span-2 bg-card rounded-xl border border-white/10 p-1 overflow-hidden h-[500px] relative group">
-                                    <div className="absolute top-4 right-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-                                        <span className="relative flex h-3 w-3">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                        </span>
-                                        <span className="text-xs font-medium text-white">Live Traffic</span>
+                                {/* Main Map Widget Removed as per user request */}
+                                <div className="lg:col-span-2 bg-[#111625] rounded-xl border border-white/5 p-8 flex flex-col items-center justify-center text-center h-[500px]">
+                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                                        <BarChart3 className="text-neon-blue w-10 h-10" />
                                     </div>
-                                    {useGoogleMaps ? (
-                                        <LiveTrafficMap intents={intents} routes={routes} stops={stops} />
-                                    ) : (
-                                        <Map intents={intents} routes={routes} stops={stops} />
-                                    )}
+                                    <h3 className="text-2xl font-bold text-white mb-2">Analytics Overview</h3>
+                                    <p className="text-gray-400 max-w-md mb-6">
+                                        The live map has been disabled. View detailed operational reports and system analytics to optimize fleet performance.
+                                    </p>
+                                    <button
+                                        onClick={() => router.push('/admin/reports')}
+                                        className="px-6 py-3 bg-neon-blue text-black font-bold rounded-lg hover:shadow-neon-blue/50 transition-all flex items-center gap-2"
+                                    >
+                                        <TrendingUp size={18} /> View Reports
+                                    </button>
                                 </div>
                                 {/* Heatmap / Live Demand */}
                                 <div className="bg-[#111625] rounded-2xl border border-white/5 shadow-xl overflow-hidden flex flex-col h-[400px]">

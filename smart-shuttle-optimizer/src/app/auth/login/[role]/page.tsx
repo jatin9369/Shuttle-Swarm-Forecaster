@@ -15,18 +15,30 @@ interface Props {
 export default function RoleLoginPage(props: Props) {
     const params = use(props.params);
     const router = useRouter();
+
+    // Config with static classes to ensure Tailwind compatibility
     const roleConfig = {
-        rider: { title: 'Student Login', color: 'blue' },
-        driver: { title: 'Driver Login', color: 'orange' },
-        admin: { title: 'QAdmin Login', color: 'red' }
+        rider: {
+            title: 'Student Login',
+            iconBg: 'bg-blue-600',
+            buttonStyle: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+            linkText: 'text-blue-600 hover:text-blue-500'
+        },
+        driver: {
+            title: 'Driver Login',
+            iconBg: 'bg-orange-600',
+            buttonStyle: 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500',
+            linkText: 'text-orange-600 hover:text-orange-500'
+        },
+        admin: {
+            title: 'QAdmin Login',
+            iconBg: 'bg-red-600',
+            buttonStyle: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+            linkText: 'text-red-600 hover:text-red-500'
+        }
     };
 
-    const currentRole = (roleConfig[params.role as keyof typeof roleConfig] || roleConfig.rider) as { title: string, color: string };
-
-    // Fallback if role is invalid
-    if (!roleConfig[params.role as keyof typeof roleConfig]) {
-        // redirect handled by logic or just show generic
-    }
+    const currentRole = (roleConfig[params.role as keyof typeof roleConfig] || roleConfig.rider);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -47,7 +59,6 @@ export default function RoleLoginPage(props: Props) {
             const { token, role } = res.data;
 
             // Allow login only if roles match or if it's a super-user/admin situation (optional logic)
-            // Ideally backend verifies, but for UI feedback:
             if (role !== params.role && role !== 'admin') {
                 setError(`This account is not registered as a ${params.role}.`);
                 return;
@@ -57,10 +68,7 @@ export default function RoleLoginPage(props: Props) {
             localStorage.setItem('role', role);
 
             // Set cookie for middleware
-            console.log('Setting cookie...');
-            // Using Lax for local development to ensure cookies are sent
             document.cookie = `token=${token}; path=/; max-age=432000; SameSite=Lax`;
-            console.log('Cookie set:', document.cookie);
 
             console.log('Redirecting to dashboard for role:', role);
             if (role === 'admin') router.push('/admin');
@@ -85,7 +93,7 @@ export default function RoleLoginPage(props: Props) {
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
-                    <div className={`bg-${currentRole.color}-600 p-3 rounded-full`}>
+                    <div className={`${currentRole.iconBg} p-3 rounded-full`}>
                         <Lock className="text-white w-8 h-8" />
                     </div>
                 </div>
@@ -149,7 +157,7 @@ export default function RoleLoginPage(props: Props) {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-${currentRole.color}-600 hover:bg-${currentRole.color}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${currentRole.color}-500 disabled:opacity-50 transition-colors`}
+                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 transition-colors ${currentRole.buttonStyle}`}
                             >
                                 {loading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Sign in'}
                             </button>
@@ -159,7 +167,7 @@ export default function RoleLoginPage(props: Props) {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             Don&apos;t have a {params.role} account?{' '}
-                            <Link href={`/auth/signup/${params.role}`} className={`font-medium text-${currentRole.color}-600 hover:text-${currentRole.color}-500`}>
+                            <Link href={`/auth/signup/${params.role}`} className={`font-medium ${currentRole.linkText}`}>
                                 Sign up
                             </Link>
                         </p>

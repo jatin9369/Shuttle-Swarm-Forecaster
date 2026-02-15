@@ -61,6 +61,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/intents', require('./routes/intents'));
 app.use('/api/routes', require('./routes/routes'));
 app.use('/api/stops', require('./routes/stops'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/buses', require('./routes/buses'));
+app.use('/api/optimizer', require('./routes/optimizer'));
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
