@@ -23,58 +23,109 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180);
 }
 
-// Cluster requests using a simple distance-based approach (simplified DBSCAN)
+// Map Stop IDs to Coordinates (Mock for Prototype if DB is empty)
+const MOCK_STOPS = {
+    'Hostel A': { lat: 12.9716, lng: 77.5946 },
+    'Main Block': { lat: 12.9720, lng: 77.5950 },
+    'Library': { lat: 12.9730, lng: 77.5960 },
+    'Sports Complex': { lat: 12.9740, lng: 77.5930 }
+};
+
+async function getCoordinates(stopIdentifier) {
+    // 1. Try DB
+    if (stopIdentifier.match(/^[0-9a-fA-F]{24}$/)) {
+        const stop = await Stop.findById(stopIdentifier);
+        if (stop) return { lat: stop.location.lat, lng: stop.location.lng, name: stop.name };
+    }
+    // 2. Try Mock
+    if (MOCK_STOPS[stopIdentifier]) {
+        return { ...MOCK_STOPS[stopIdentifier], name: stopIdentifier };
+    }
+    // 3. Default
+    return { lat: 12.9716, lng: 77.5946, name: 'Unknown' };
+}
+
+// K-Means Clustering Implementation
 exports.clusterRequests = async (intents) => {
-    // Fetch all stops to map coordinates
-    const stops = await Stop.find({});
-    const stopMap = {};
-    stops.forEach(s => stopMap[s._id] = s);
+    if (intents.length === 0) return [];
 
-    const clusters = [];
-    const processed = new Set();
-    const CLUSTER_RADIUS_KM = 2.0; // 2km radius for clustering
+    // 1. Prepare Data Points
+    const points = [];
+    for (const intent of intents) {
+        const coords = await getCoordinates(intent.pickupStop); // Works with ID or Name
+        points.push({
+            id: intent._id,
+            lat: coords.lat,
+            lng: coords.lng,
+            name: coords.name,
+            passengers: intent.passengers || 1,
+            original: intent
+        });
+    }
 
-    for (let i = 0; i < intents.length; i++) {
-        if (processed.has(intents[i]._id.toString())) continue;
+    // 2. Determine K (Number of Clusters)
+    // Rule of thumb: Total Passengers / Bus Capacity (e.g., 30)
+    const totalPassengers = points.reduce((sum, p) => sum + p.passengers, 0);
+    const BUS_CAPACITY = 30;
+    let K = Math.ceil(totalPassengers / BUS_CAPACITY);
+    if (K === 0) K = 1;
+    if (K > points.length) K = points.length;
 
-        const baseIntent = intents[i];
-        const baseStop = stopMap[baseIntent.pickupStop];
+    // 3. K-Means Algorithm
+    let centroids = points.slice(0, K).map(p => ({ lat: p.lat, lng: p.lng })); // Simple random init
+    let clusters = Array(K).fill().map(() => []);
+    let iterations = 0;
+    const MAX_ITER = 10;
 
-        if (!baseStop) continue;
+    while (iterations < MAX_ITER) {
+        // Clear clusters
+        clusters = Array(K).fill().map(() => []);
 
-        const cluster = [baseIntent];
-        processed.add(baseIntent._id.toString());
+        // Assignment Step
+        for (const point of points) {
+            let minDist = Infinity;
+            let clusterIdx = 0;
+            for (let i = 0; i < K; i++) {
+                const dist = getDistanceFromLatLonInKm(point.lat, point.lng, centroids[i].lat, centroids[i].lng);
+                if (dist < minDist) {
+                    minDist = dist;
+                    clusterIdx = i;
+                }
+            }
+            clusters[clusterIdx].push(point);
+        }
 
-        for (let j = i + 1; j < intents.length; j++) {
-            if (processed.has(intents[j]._id.toString())) continue;
+        // Update Step (Recalculate Centroids)
+        let changed = false;
+        for (let i = 0; i < K; i++) {
+            if (clusters[i].length === 0) continue;
 
-            const candidateIntent = intents[j];
-            const candidateStop = stopMap[candidateIntent.pickupStop];
+            const sumLat = clusters[i].reduce((sum, p) => sum + p.lat, 0);
+            const sumLng = clusters[i].reduce((sum, p) => sum + p.lng, 0);
+            const newLat = sumLat / clusters[i].length;
+            const newLng = sumLng / clusters[i].length;
 
-            if (!candidateStop) continue;
-
-            const dist = getDistanceFromLatLonInKm(
-                baseStop.location.coordinates[1], baseStop.location.coordinates[0],
-                candidateStop.location.coordinates[1], candidateStop.location.coordinates[0]
-            );
-
-            if (dist <= CLUSTER_RADIUS_KM) {
-                cluster.push(candidateIntent);
-                processed.add(candidateIntent._id.toString());
+            if (newLat !== centroids[i].lat || newLng !== centroids[i].lng) {
+                centroids[i] = { lat: newLat, lng: newLng };
+                changed = true;
             }
         }
 
-        if (cluster.length >= 3) { // Only care about clusters with enough demand
-            clusters.push({
-                center: baseStop.name, // Simplified center
-                intents: cluster,
-                size: cluster.length,
-                suggestedAction: `Deploy Shuttle to ${baseStop.name} area`
-            });
-        }
+        if (!changed) break;
+        iterations++;
     }
 
-    return clusters;
+    // 4. Format Output
+    return clusters
+        .filter(c => c.length > 0)
+        .map((c, i) => ({
+            clusterId: i + 1,
+            center: { lat: centroids[i].lat, lng: centroids[i].lng },
+            size: c.reduce((sum, p) => sum + p.passengers, 0),
+            stops: [...new Set(c.map(p => p.name))], // Unique stops
+            intents: c.map(p => p.original),
+            suggestedAction: `Deploy Bus to ${c[0].name} area (${c.length} stops grouped)`
+        }));
 };
 
 // Generate optimized route suggestion

@@ -103,12 +103,27 @@ exports.getAnalytics = async (req, res) => {
         }
 
         if (type === 'heatmap') {
-            const data = await RiderIntent.aggregate([
+            const heatmapRaw = await RiderIntent.aggregate([
                 { $match: { requestedTime: { $gte: start } } },
-                { $group: { _id: '$pickupStop.name', count: { $sum: 1 } } },
-                { $sort: { count: -1 } },
-                { $limit: 10 }
+                { $group: { _id: '$pickupStop', count: { $sum: 1 } } }, // Group by name string
+                { $sort: { count: -1 } }
             ]);
+
+            // Mock Coordinate Mapping for Demo (Since we relaxed schema to String)
+            // In product, this would be a $lookup to 'stops' collection
+            const stopCoordinates = {
+                'Hostel A': { lat: 12.9716, lng: 77.5946 },
+                'Main Block': { lat: 12.9720, lng: 77.5950 },
+                'Library': { lat: 12.9730, lng: 77.5960 },
+                'Sports Complex': { lat: 12.9740, lng: 77.5930 }
+            };
+
+            const data = heatmapRaw.map(item => ({
+                stopName: item._id,
+                intensity: item.count,
+                location: stopCoordinates[item._id] || { lat: 12.9716, lng: 77.5946 } // Default
+            }));
+
             return res.json(data);
         }
 

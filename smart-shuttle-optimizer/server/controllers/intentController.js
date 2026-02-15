@@ -9,7 +9,7 @@ const routingService = require('../services/routingService');
 // @access  Public/Private
 exports.submitIntent = async (req, res) => {
     try {
-        const { pickupStopId, dropoffStopId, passengers = 1, deviceFingerprint, requestedTime } = req.body;
+        const { pickupStopId, dropoffStopId, passengers = 1, deviceFingerprint, requestedTime, timeWindow, isRecurring, recurringDays } = req.body;
         const userId = req.user ? req.user.id : null;
 
         // 1. Validate Stops
@@ -40,8 +40,8 @@ exports.submitIntent = async (req, res) => {
                 message = `Booking Confirmed! Assigned to Bus ${availableBus.plateNumber}.`;
 
                 // Real-time update to Admin/Drivers
-                const io = req.app.get('socketio');
-                if (io) io.emit('busUpdate', availableBus);
+                // const io = req.app.get('socketio');
+                // if (io) io.emit('busUpdate', availableBus);
             } else {
                 message = "Bus is nearly full. You are on the waitlist.";
             }
@@ -57,7 +57,10 @@ exports.submitIntent = async (req, res) => {
             passengers,
             deviceFingerprint,
             requestedTime: requestedTime || new Date(),
-            status: bookingStatus
+            status: bookingStatus,
+            timeWindow: timeWindow || { start: '00:00', end: '23:59' }, // Default window if missing
+            isRecurring: isRecurring || false,
+            recurringDays: recurringDays || []
         });
 
         await intent.save();

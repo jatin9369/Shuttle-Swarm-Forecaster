@@ -22,6 +22,20 @@ const UserSchema = new mongoose.Schema({
   phone: {
     type: String
   },
+  // Student Profile Fields
+  department: { type: String },
+  year: { type: String }, // e.g., "1st Year", "2nd Year"
+  hostel: { type: String }, // e.g., "Hostel A"
+  homeLocation: {
+    address: String,
+    lat: Number,
+    lng: Number
+  },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stop'
+  }],
+  qrCodeId: { type: String, unique: true, sparse: true }, // For student ID card mapping
   createdAt: {
     type: Date,
     default: Date.now

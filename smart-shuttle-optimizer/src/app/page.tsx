@@ -1,494 +1,485 @@
 'use client';
 
 import Link from 'next/link';
-import { User, Bus, ShieldCheck, ArrowRight, Zap, Map, Smartphone, CheckCircle2, Leaf, Clock, TrendingUp, Wind, TreePine, Car, Target, Eye, Heart, Play, Users } from 'lucide-react';
+import { User, Bus, ShieldCheck, ArrowRight, Zap, Map, Heart, ChevronRight, Activity, Calendar, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
+import TestimonialSlider from './components/TestimonialSlider';
 
 const roles = [
   {
     id: 'rider',
     title: 'Student / Rider',
-    description: 'Track shuttles in real-time and plan your commute effortlessly.',
+    description: 'Real-time tracking and effortless commute planning.',
     icon: User,
-    color: 'purple',
+    color: 'from-emerald-500 to-green-500',
     href: '/auth/login/rider',
   },
   {
     id: 'driver',
     title: 'Shuttle Driver',
-    description: 'Manage your route, view passengers, and get live traffic updates.',
+    description: 'Route management and passenger insights.',
     icon: Bus,
-    color: 'purple',
+    color: 'from-teal-500 to-cyan-500',
     href: '/auth/login/driver',
   },
   {
     id: 'admin',
     title: 'Administrator',
-    description: 'Monitor the entire fleet, analyze demand, and optimize routes.',
+    description: 'Fleet monitoring and AI-powered route optimization.',
     icon: ShieldCheck,
-    color: 'purple',
+    color: 'from-green-600 to-emerald-600',
     href: '/auth/login/admin',
   },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden text-[#101828]">
+    <div className="min-h-screen bg-emerald-50 font-body overflow-x-hidden text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-brave-purple to-brave-pink rounded-xl flex items-center justify-center text-white shadow-lg shadow-brave-purple/20">
-              <Bus size={24} />
+      {/* Background Gradients */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-green-500/10 rounded-full blur-[100px] animate-float"></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] bg-teal-500/10 rounded-full blur-[120px]"></div>
+      </div>
+
+      {/* Floating Navbar */}
+      <nav className="fixed top-6 left-0 right-0 z-50 px-4 md:px-0">
+        <div className="container mx-auto max-w-6xl">
+          <div className="glass-panel rounded-full px-6 py-3 flex items-center justify-between border-emerald-100/50 bg-white/80 backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-green-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                <Bus size={20} />
+              </div>
+              <span className="text-xl font-heading font-bold tracking-tight text-slate-800">Smart<span className="text-emerald-600">Shuttle</span></span>
             </div>
-            <span className="text-2xl font-bold tracking-tight text-[#101828]">Smart<span className="text-brave-purple">Shuttle</span></span>
-          </div>
 
-          <div className="hidden md:flex items-center gap-8 font-medium text-gray-600">
-            <Link href="#" className="hover:text-brave-purple transition-colors">Home</Link>
-            <Link href="#impact" className="hover:text-brave-purple transition-colors">Impact</Link>
-            <Link href="#features" className="hover:text-brave-purple transition-colors">Features</Link>
-            <Link href="#roles" className="hover:text-brave-purple transition-colors">Roles</Link>
-            <Link href="/live-map" className="hover:text-brave-purple transition-colors">Live Map</Link>
-          </div>
+            <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
+              {['Features', 'Roles'].map((item) => (
+                <Link key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-emerald-600 transition-colors relative group">
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-600 transition-all group-hover:w-full"></span>
+                </Link>
+              ))}
+            </div>
 
-          <Link href="/auth/login/rider" className="hidden md:flex bg-[#101828] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-brave-purple transition-all shadow-lg shadow-brave-purple/20">
-            Get Started
-          </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/live-map" className="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-emerald-600 transition-colors">
+                <Map size={16} /> Live Map
+              </Link>
+              <Link href="/auth/login/rider" className="bg-emerald-900 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-emerald-800 transition-all hover:scale-105 shadow-lg shadow-emerald-900/20 flex items-center gap-2">
+                Get Started
+              </Link>
+            </div>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <header className="relative pt-20 pb-32 overflow-hidden bg-gradient-to-b from-purple-50/50 to-white">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+      <header className="relative pt-40 pb-32 overflow-hidden z-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
-            {/* Text Content */}
-            <div className="lg:w-1/2 relative z-10 animate-in slide-in-from-left duration-1000">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brave-purple/10 text-brave-purple font-semibold text-sm mb-6 border border-brave-purple/20">
-                <Zap size={14} className="fill-brave-purple" /> #1 Campus Innovation
-              </div>
+            {/* Left Content */}
+            <div className="lg:w-1/2 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-semibold text-xs uppercase tracking-wide mb-8"
+              >
+                <Zap size={14} className="fill-emerald-700" /> Next-Gen Green Mobility
+              </motion.div>
 
-              <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight text-[#101828]">
-                Smart Commute. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brave-purple to-brave-pink">Save Time.</span> <br />
-                Go Green.
-              </h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-5xl lg:text-7xl font-heading font-bold leading-[1.1] mb-8 tracking-tight text-slate-900"
+              >
+                Reinventing <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-green-600 to-teal-500 animate-gradient-x">Daily Commute</span>
+              </motion.h1>
 
-              <p className="text-xl text-gray-500 mb-8 max-w-lg leading-relaxed">
-                Join the smartest transportation network. AI-powered routing, live tracking, and seamless co-riding for the entire campus.
-              </p>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-xl text-slate-500 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+              >
+                Experience the future of transportation. AI-driven routing, real-time analytics, and eco-friendly connections for a smarter campus.
+              </motion.p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link href="#roles" className="px-8 py-4 bg-brave-purple text-white font-bold rounded-xl shadow-xl shadow-brave-purple/30 hover:shadow-2xl hover:scale-105 transition-all text-center flex items-center justify-center gap-2">
-                  Start Riding <ArrowRight size={20} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start"
+              >
+                <Link href="#roles" className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3">
+                  Start Riding Now <ArrowRight size={20} />
                 </Link>
-                <Link href="/live-map" className="px-8 py-4 bg-white text-[#101828] border border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition-all text-center flex items-center justify-center gap-2 shadow-sm">
-                  <Map size={20} className="text-brave-purple" /> View Map
+                <Link href="/live-map" className="px-8 py-4 bg-white text-slate-700 border border-emerald-200 font-bold rounded-2xl hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 hover-shine group">
+                  <Map size={20} className="text-emerald-600 group-hover:scale-110 transition-transform" /> View Live Map
                 </Link>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-8 text-gray-500 font-medium border-t border-gray-200 pt-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-center lg:justify-start gap-8 text-sm font-medium text-slate-500"
+              >
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 size={20} className="text-brave-purple" /> Verified Riders
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className={`w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] bg-[url('https://i.pravatar.cc/100?img=${i}')] bg-cover`}></div>
+                    ))}
+                  </div>
+                  <span>Loved by 5000+ Students</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={20} className="text-brave-purple" /> Live Tracking
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={20} className="text-brave-purple" /> Eco-Friendly
-                </div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Phone Mockup / Image Area */}
-            <div className="lg:w-1/2 relative z-10 animate-in slide-in-from-right duration-1000 delay-200 flex justify-center">
-              <div className="relative border-gray-900 bg-gray-900 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-2xl shadow-brave-purple/40 rotate-[-6deg] hover:rotate-0 transition-all duration-500 z-20">
-                <div className="h-[32px] w-[3px] bg-gray-800 absolute -start-[17px] top-[72px] rounded-s-lg"></div>
-                <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[124px] rounded-s-lg"></div>
-                <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[178px] rounded-s-lg"></div>
-                <div className="h-[64px] w-[3px] bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
-                <div className="rounded-[2rem] overflow-hidden w-[272px] h-[572px] bg-white relative">
-                  {/* Mock App UI */}
-                  <div className="bg-brave-purple h-40 rounded-b-3xl relative p-6 flex flex-col justify-center">
-                    <h3 className="text-white font-bold text-xl">Good Morning, <br /> Nitin!</h3>
-                    <div className="absolute -bottom-6 left-6 right-6 bg-white p-4 rounded-xl shadow-lg flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                        <Map size={20} className="text-black" />
+            {/* Right Visual - 3D Phone Mockup */}
+            <div className="lg:w-1/2 relative delay-200" style={{ perspective: '1000px' }}>
+              <div className="relative mx-auto w-[320px] h-[640px] bg-emerald-950 rounded-[3rem] border-8 border-emerald-950 shadow-2xl shadow-emerald-500/20 rotate-[-12deg] hover:rotate-0 transition-all duration-700 z-20 overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-emerald-950 rounded-b-xl z-20"></div>
+
+                {/* Screen Content */}
+                <div className="w-full h-full bg-slate-50 relative overflow-hidden flex flex-col">
+                  <div className="h-1/2 bg-emerald-600 relative p-6">
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+                    <div className="flex justify-between items-center text-white mt-8 mb-6">
+                      <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center"><User size={16} /></div>
+                      <div className="font-bold">My Profile</div>
+                      <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center"><Bus size={16} /></div>
+                    </div>
+                    <h2 className="text-white text-3xl font-heading font-bold">Good Morning,<br />Alex!</h2>
+
+                    <div className="mt-6 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex items-center gap-4">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-600 shadow-sm">
+                        <Map size={20} />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Destination</p>
-                        <p className="text-sm font-bold">Engineering Block A</p>
+                        <p className="text-emerald-100 text-xs">Destination</p>
+                        <p className="text-white font-bold">Block C, Engg Dept.</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-12 px-6">
-                    <h4 className="font-bold text-gray-800 mb-4">Nearby Shuttles</h4>
+                  <div className="flex-1 bg-slate-50 rounded-t-3xl -mt-6 relative z-10 p-6">
+                    <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
+                    <h3 className="font-bold text-slate-800 mb-4">Nearby Shuttles</h3>
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm text-2xl">🚌</div>
+                        <div key={i} className="flex items-center gap-4 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-emerald-200 transition-colors">
+                          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-2xl">🚌</div>
                           <div className="flex-1">
-                            <p className="text-sm font-bold text-gray-800">Route #{100 + i}</p>
-                            <p className="text-xs text-green-600 font-medium">Arriving in {i * 2} min</p>
+                            <h4 className="font-bold text-slate-800">Shuttle #{100 + i}</h4>
+                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                              <span className="text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">On Time</span>
+                              <span>• 5 mins away</span>
+                            </div>
                           </div>
-                          <button className="bg-black text-white px-3 py-1 rounded-lg text-xs font-bold">Track</button>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  <div className="absolute bottom-0 w-full p-4 bg-gray-50 border-t">
-                    <div className="flex justify-around text-gray-400">
-                      <div className="flex flex-col items-center gap-1 text-brave-purple"><Map size={20} /><span className="text-[10px] font-bold">Home</span></div>
-                      <div className="flex flex-col items-center gap-1"><Clock size={20} /><span className="text-[10px]">Trips</span></div>
-                      <div className="flex flex-col items-center gap-1"><User size={20} /><span className="text-[10px]">Profile</span></div>
-                    </div>
-                  </div>
                 </div>
               </div>
-              {/* Decorative Blob Behind Phone */}
-              <div className="absolute top-20 right-[-50px] w-72 h-72 bg-brave-purple rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-            </div>
 
+              {/* Decorative Elements behind phone */}
+              <div className="absolute top-20 right-0 w-64 h-64 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+              <div className="absolute bottom-20 left-0 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Impact Section - Growing Every Day */}
-      <section id="impact" className="py-20 bg-brave-purple relative overflow-hidden text-center text-white">
-        <div className="absolute inset-0 bg-dot-pattern opacity-10"></div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="inline-block px-4 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-sm font-medium mb-4">
-            Our Impact
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Growing Every Day</h2>
-          <p className="text-purple-200 max-w-2xl mx-auto mb-16 text-lg">
-            Trusted by thousands of students and faculty across campus for their daily commute.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              { label: "App Downloads", value: "9,000+", bg: "bg-white/10" },
-              { label: "Peak Daily Rides", value: "150+", bg: "bg-white/10" },
-              { label: "Cost Savings", value: "75%", bg: "bg-white/10" },
-              { label: "Trees Equivalent", value: "500+", bg: "bg-[#0ea5e9]/20 border border-[#0ea5e9]/30" } // Highlighted card
-            ].map((stat, idx) => (
-              <div key={idx} className={`p-8 rounded-2xl backdrop-blur-sm border border-white/10 ${stat.bg} hover:transform hover:-translate-y-1 transition-transform`}>
-                <h3 className="text-4xl font-bold mb-2">{stat.value}</h3>
-                <p className="text-purple-200 font-medium">{stat.label}</p>
+      {/* DASHBOARD COMMAND CENTER - Quick Access */}
+      <section className="relative z-20 -mt-20 mb-20">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl shadow-emerald-500/20 border border-slate-800">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  🚀 Launchpad <Link href="/launchpad" className="text-emerald-400 text-sm bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">Live Demo</Link>
+                </h2>
+                <p className="text-slate-400 text-sm">Instant access to all modules and features.</p>
               </div>
-            ))}
+            </div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                }
+              }}
+              className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"
+            >
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/rider/request" className="group bg-slate-800 p-4 rounded-xl hover:bg-emerald-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-emerald-500 block h-full">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Bus size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Request Ride</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-emerald-100">Student Portal</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/driver/dashboard" className="group bg-slate-800 p-4 rounded-xl hover:bg-teal-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-teal-500 block h-full">
+                  <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center text-teal-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <User size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Driver App</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-teal-100">Route View</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/admin/dashboard/live" className="group bg-slate-800 p-4 rounded-xl hover:bg-red-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-red-500 block h-full">
+                  <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center text-red-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Admin Console</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-red-100">Live Ops</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/admin/analytics" className="group bg-slate-800 p-4 rounded-xl hover:bg-green-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-green-500 block h-full">
+                  <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Zap size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Analytics & AI</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-green-100">Forecasting</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/admin/system/health" className="group bg-slate-800 p-4 rounded-xl hover:bg-cyan-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-cyan-500 block h-full">
+                  <div className="w-10 h-10 bg-cyan-600/20 rounded-lg flex items-center justify-center text-cyan-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Activity size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">System Health</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-cyan-100">Audit Logs</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/rider/live-map" className="group bg-slate-800 p-4 rounded-xl hover:bg-emerald-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-emerald-500 block h-full">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Map size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Live Map</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-emerald-100">Global View</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/admin/dashboard/heatmap" className="group bg-slate-800 p-4 rounded-xl hover:bg-lime-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-lime-500 block h-full">
+                  <div className="w-10 h-10 bg-lime-500/20 rounded-lg flex items-center justify-center text-lime-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Zap size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Heatmap</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-lime-100">Demand View</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/rider/profile" className="group bg-slate-800 p-4 rounded-xl hover:bg-teal-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-teal-500 block h-full">
+                  <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center text-teal-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <User size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Profile</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-teal-100">User Data</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/rider/schedule" className="group bg-slate-800 p-4 rounded-xl hover:bg-green-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-green-500 block h-full">
+                  <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <Calendar size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Schedule</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-green-100">My Trips</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <Link href="/admin/reports" className="group bg-slate-800 p-4 rounded-xl hover:bg-teal-600 transition-all hover:-translate-y-1 border border-slate-700 hover:border-teal-500 block h-full">
+                  <div className="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center text-teal-400 group-hover:bg-white/20 group-hover:text-white mb-3">
+                    <FileText size={20} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm">Reports</h3>
+                  <p className="text-slate-400 text-xs group-hover:text-teal-100">Export PDF</p>
+                </Link>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Green Journey Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-green-50/50">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#101828] mb-4">
-            Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-green-500">Green Journey</span>
-          </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto mb-16">
-            Every shared ride makes a difference. See how our community is helping the planet.
-          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1 */}
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 text-left hover:shadow-2xl transition-shadow">
-              <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600 mb-6">
-                <Wind size={28} />
-              </div>
-              <h3 className="text-4xl font-bold text-[#101828] mb-2">2,450 kg</h3>
-              <p className="font-bold text-gray-800 mb-2">CO2 Saved</p>
-              <p className="text-sm text-gray-500 mb-6">Carbon emissions prevented through ride-sharing.</p>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 w-[70%] rounded-full"></div>
+      {/* Bento Grid Features */}
+      <section id="features" className="py-32 relative scroll-mt-40">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6 text-slate-900">Everything you need to <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">move smarter.</span></h2>
+            <p className="text-slate-500 text-lg">Powerful features wrapped in a simple, beautiful interface. Designed for students, drivers, and admins.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(200px,auto)]">
+            {/* Card 1 - Large Left */}
+            <div className="md:col-span-2 glass-card p-10 rounded-3xl relative overflow-hidden group border-emerald-100">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-100 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-emerald-200 transition-colors"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <Map size={28} />
+                </div>
+                <h3 className="text-3xl font-heading font-bold text-slate-800 mb-4">Live Tracking Map</h3>
+                <p className="text-slate-500 max-w-md">Real-time visibility of every shuttle in the network. See current capacity, estimated arrival times, and traffic conditions instantly.</p>
               </div>
             </div>
 
-            {/* Card 2 */}
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 text-left hover:shadow-2xl transition-shadow">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mb-6">
-                <TreePine size={28} />
-              </div>
-              <h3 className="text-4xl font-bold text-[#101828] mb-2">122</h3>
-              <p className="font-bold text-gray-800 mb-2">Trees Equivalent</p>
-              <p className="text-sm text-gray-500 mb-6">Annual CO2 absorption equivalent.</p>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 w-[45%] rounded-full"></div>
+            {/* Card 2 - Tall Right */}
+            <div className="md:row-span-2 glass-card p-10 rounded-3xl relative overflow-hidden group bg-gradient-to-b from-slate-900 to-slate-800 text-white border-emerald-900">
+              <div className="absolute bottom-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="w-14 h-14 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center text-emerald-300 mb-6 border border-white/10">
+                  <Zap size={28} />
+                </div>
+                <h3 className="text-3xl font-heading font-bold mb-4">AI Optimization</h3>
+                <p className="text-slate-400 mb-8">Our proprietary algorithms analyze historical data to predict demand and optimize routes dynamically.</p>
+
+                <div className="mt-auto p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-sm font-medium text-slate-300">Efficiency Boost</span>
+                    <span className="text-2xl font-bold text-emerald-400">+42%</span>
+                  </div>
+                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 w-[70%]"></div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Card 3 */}
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 text-left hover:shadow-2xl transition-shadow">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
-                <Car size={28} />
+            <div className="glass-card p-8 rounded-3xl relative overflow-hidden group border-emerald-100">
+              <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-500 mb-4">
+                <Heart size={24} />
               </div>
-              <h3 className="text-4xl font-bold text-[#101828] mb-2">5,890 mi</h3>
-              <p className="font-bold text-gray-800 mb-2">Car Miles Avoided</p>
-              <p className="text-sm text-gray-500 mb-6">Solo driving prevented across campus.</p>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-600 w-[85%] rounded-full"></div>
+              <h3 className="text-xl font-heading font-bold text-slate-800 mb-2">Eco-Friendly</h3>
+              <p className="text-slate-500 text-sm">Reduce your carbon footprint by sharing the ride.</p>
+            </div>
+
+            {/* Card 4 */}
+            <div className="glass-card p-8 rounded-3xl relative overflow-hidden group border-emerald-100">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 mb-4">
+                <ShieldCheck size={24} />
               </div>
+              <h3 className="text-xl font-heading font-bold text-slate-800 mb-2">Secure & Safe</h3>
+              <p className="text-slate-500 text-sm">Verified riders and monitored rides for peace of mind.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works - Advanced Timeline */}
-      <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-[20%] left-[-5%] w-96 h-96 bg-brave-purple/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-[20%] right-[-5%] w-96 h-96 bg-brave-pink/5 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
-            <span className="text-brave-purple font-bold tracking-wider text-sm uppercase mb-2 block">Simple & Seamless</span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#101828]">How Smart Shuttle <span className="text-transparent bg-clip-text bg-gradient-to-r from-brave-purple to-brave-pink">Works</span></h2>
-          </div>
-
-          <div className="relative">
-            {/* Connecting Line (Desktop) */}
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-gray-100 via-brave-purple/20 to-gray-100 -translate-y-1/2"></div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {/* Step 1 */}
-              <div className="relative group bg-white p-8 rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-brave-purple text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md z-10 group-hover:scale-110 transition-transform">1</div>
-                <div className="mt-6 text-center">
-                  <div className="w-20 h-20 mx-auto bg-purple-50 rounded-2xl flex items-center justify-center text-brave-purple mb-6 group-hover:rotate-12 transition-transform">
-                    <Smartphone size={32} />
-                  </div>
-                  <h3 className="text-xl font-bold text-[#101828] mb-3">Book via App</h3>
-                  <p className="text-gray-500 leading-relaxed">
-                    Enter your destination. Our AI checks your schedule and suggests the best pickup time.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="relative group bg-white p-8 rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-brave-pink text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md z-10 group-hover:scale-110 transition-transform">2</div>
-                <div className="mt-6 text-center">
-                  <div className="w-20 h-20 mx-auto bg-pink-50 rounded-2xl flex items-center justify-center text-brave-pink mb-6 group-hover:-rotate-12 transition-transform">
-                    <Users size={32} />
-                  </div>
-                  <h3 className="text-xl font-bold text-[#101828] mb-3">Get Matched</h3>
-                  <p className="text-gray-500 leading-relaxed">
-                    We pair you with other riders going your way. Smart routing ensures no unnecessary detours.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="relative group bg-white p-8 rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md z-10 group-hover:scale-110 transition-transform">3</div>
-                <div className="mt-6 text-center">
-                  <div className="w-20 h-20 mx-auto bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mb-6 group-hover:rotate-12 transition-transform">
-                    <Bus size={32} />
-                  </div>
-                  <h3 className="text-xl font-bold text-[#101828] mb-3">Ride & Relax</h3>
-                  <p className="text-gray-500 leading-relaxed">
-                    Hop on the shuttle. Track it live, enjoy the Wi-Fi, and arrive on time, every time.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Beliefs */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
+      {/* Role Selection */}
+      <section id="roles" className="py-24 bg-white relative scroll-mt-40">
+        <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-gray-100 text-gray-600 font-bold text-xs uppercase tracking-wider mb-4">
-              What Drives Us
-            </div>
-            <h2 className="text-4xl font-bold text-[#101828]">Our Core <span className="text-[#0ea5e9]">Beliefs</span></h2>
-            <p className="text-gray-500 mt-4">The principles that guide every decision we make.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Mission */}
-            <div className="bg-blue-50/50 p-10 rounded-[2.5rem] hover:bg-blue-50 transition-colors">
-              <div className="w-16 h-16 bg-blue-200/50 rounded-2xl flex items-center justify-center text-blue-600 mb-8">
-                <Target size={32} />
-              </div>
-              <h3 className="text-2xl font-bold text-[#101828] mb-4">Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To make travel affordable and accessible for everyone through smart pooling — connecting people who share similar routes while reducing environmental impact.
-              </p>
-            </div>
-
-            {/* Vision */}
-            <div className="bg-teal-50/50 p-10 rounded-[2.5rem] hover:bg-teal-50 transition-colors">
-              <div className="w-16 h-16 bg-teal-200/50 rounded-2xl flex items-center justify-center text-teal-600 mb-8">
-                <Eye size={32} />
-              </div>
-              <h3 className="text-2xl font-bold text-[#101828] mb-4">Vision</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To become the most trusted transit platform, where every shared ride means savings for riders, efficiency for the campus, and a greener planet for everyone.
-              </p>
-            </div>
-
-            {/* Values */}
-            <div className="bg-purple-50/50 p-10 rounded-[2.5rem] hover:bg-purple-50 transition-colors">
-              <div className="w-16 h-16 bg-purple-200/50 rounded-2xl flex items-center justify-center text-purple-600 mb-8">
-                <Heart size={32} />
-              </div>
-              <h3 className="text-2xl font-bold text-[#101828] mb-4">Values</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Legal and ethical operations, rider safety, environmental sustainability, and creating value for our entire community through continuous innovation.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Comparison / Feature Blocks */}
-      <section id="features" className="py-24 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="lg:w-1/2">
-              <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-gray-100 relative overflow-hidden">
-                {/* Decorative Background */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-brave-purple/5 rounded-full blur-3xl -z-10"></div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-red-50 border border-red-100">
-                    <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500">
-                      <Clock size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-800">Without Smart Shuttle</h4>
-                      <p className="text-sm text-gray-500">Long wait times, crowded stops, unpredictable delays.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-sm">VS</div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-green-50 border border-green-100 shadow-md">
-                    <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                      <TrendingUp size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-800">With Smart Shuttle</h4>
-                      <p className="text-sm text-gray-500">AI-optimized routes, 40% faster commute, guaranteed seats.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:w-1/2">
-              <span className="text-brave-purple font-bold tracking-wider text-sm uppercase mb-2 block">The Technology</span>
-              <h2 className="text-4xl font-extrabold text-[#101828] mb-6">
-                Not just a bus. <br /> A <span className="text-transparent bg-clip-text bg-gradient-to-r from-brave-purple to-brave-pink">Data-Driven Network.</span>
-              </h2>
-              <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                Our algorithms analyze thousands of data points every second—from student schedules to traffic patterns—to ensure shuttles are exactly where they need to be.
-              </p>
-
-              <div className="space-y-4">
-                {[
-                  "Real-time Demand Heatmaps",
-                  "Dynamic Rerouting for Traffic",
-                  "Predictive Capacity Planning",
-                  "Seamless Driver Communication"
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                      <CheckCircle2 size={14} />
-                    </div>
-                    <span className="font-medium text-gray-700">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Roles / Triple Win Section */}
-      <section id="roles" className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-block px-4 py-1.5 rounded-full bg-brave-purple/10 text-brave-purple font-bold text-sm mb-4">
-              The Smart Choice
-            </div>
-            <h2 className="text-4xl font-bold text-[#101828] mb-4">Why Smart Shuttle is <span className="text-brave-purple">Smarter</span></h2>
-            <p className="text-gray-500 text-lg">Designed for everyone on campus. Select your role to get started.</p>
+            <span className="text-emerald-600 font-bold tracking-widest text-xs uppercase">Get Started</span>
+            <h2 className="text-4xl font-heading font-bold text-slate-900 mt-2">Choose your portal</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {roles.map((role) => {
               const Icon = role.icon;
               return (
-                <div key={role.id} className="group bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-brave-purple/10 hover:-translate-y-2 transition-all duration-300">
-                  <div className={`w-16 h-16 rounded-2xl mb-6 flex items-center justify-center text-3xl transition-transform group-hover:scale-110 group-hover:rotate-6 bg-${role.color === 'purple' ? 'purple' : 'pink'}-50 text-brave-purple`}>
-                    <Icon className="w-8 h-8" />
+                <Link href={role.href} key={role.id} className="group relative">
+                  <div className={`absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl blur-xl -z-10 ${role.color}`}></div>
+                  <div className="bg-white border border-slate-100 p-8 rounded-3xl h-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 relative z-10 overflow-hidden">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.color} flex items-center justify-center text-white mb-6 shadow-md`}>
+                      <Icon size={32} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">{role.title}</h3>
+                    <p className="text-slate-500 mb-8">{role.description}</p>
+
+                    <div className="flex items-center text-sm font-bold text-emerald-600 group-hover:gap-2 transition-all">
+                      Access Portal <ChevronRight size={16} />
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#101828] mb-3">{role.title}</h3>
-                  <p className="text-gray-500 mb-8 leading-relaxed">
-                    {role.description}
-                  </p>
-                  <Link href={role.href} className="flex items-center gap-2 font-bold text-brave-purple group-hover:translate-x-1 transition-transform">
-                    Access Portal <ArrowRight size={18} />
-                  </Link>
-                </div>
-              )
+                </Link>
+              );
             })}
           </div>
         </div>
       </section>
 
+
       {/* Footer */}
-      <footer className="bg-[#101828] text-white py-16">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12 mb-12">
-            <div className="col-span-1 md:col-span-1">
-              <span className="text-2xl font-bold tracking-tight text-white mb-6 block">Smart<span className="text-brave-purple">Shuttle</span></span>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Reimagining campus transportation for a greener, faster future.
+      <footer className="bg-slate-900 text-slate-300 py-20 border-t border-slate-800">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            <div className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-6 text-white">
+                <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+                  <Bus size={16} />
+                </div>
+                <span className="text-xl font-heading font-bold">Smart<span className="text-emerald-400">Shuttle</span></span>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6">
+                Optimizing campus mobility one ride at a time. Join the revolution today.
               </p>
+              <div className="flex gap-4">
+                {/* Socials could go here */}
+              </div>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">Features</a></li>
-                <li><a href="#" className="hover:text-white">Live Map</a></li>
-                <li><a href="#" className="hover:text-white">Driver App</a></li>
+              <h4 className="text-white font-bold mb-6">Platform</h4>
+              <ul className="space-y-3 text-sm">
+                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="/live-map" className="hover:text-white transition-colors">Live Map</Link></li>
+                <li><Link href="/auth/login/driver" className="hover:text-white transition-colors">For Drivers</Link></li>
               </ul>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+              <h4 className="text-white font-bold mb-6">Company</h4>
+              <ul className="space-y-3 text-sm">
+                <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               </ul>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
-              </ul>
+              <h4 className="text-white font-bold mb-6">Newsletter</h4>
+              <p className="text-xs text-slate-500 mb-4">Stay updated with the latest features.</p>
+              <div className="flex gap-2">
+                <input type="email" placeholder="Email address" className="bg-slate-800 border-none rounded-lg px-4 py-2 text-sm w-full focus:ring-2 focus:ring-emerald-600" />
+                <button className="bg-emerald-600 text-white rounded-lg px-3 py-2 hover:bg-emerald-500 transition-colors"><ArrowRight size={16} /></button>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center justify-between text-gray-500 text-sm">
+
+          <div className="border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
             <p>© 2024 Smart Shuttle Optimizer. All rights reserved.</p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              {/* Social Icons Placeholder */}
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <Link href="#" className="hover:text-white">Terms</Link>
+              <Link href="#" className="hover:text-white">Privacy</Link>
+              <Link href="#" className="hover:text-white">Cookies</Link>
             </div>
           </div>
         </div>

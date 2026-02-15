@@ -2,13 +2,11 @@ const mongoose = require('mongoose');
 
 const RiderIntentSchema = new mongoose.Schema({
     pickupStop: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Stop',
+        type: String, // Changed from ObjectId for flexibility during dev
         required: true
     },
     dropoffStop: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Stop',
+        type: String, // Changed from ObjectId
         required: true
     },
     userId: {
@@ -39,7 +37,24 @@ const RiderIntentSchema = new mongoose.Schema({
     isPredicted: {
         type: Boolean,
         default: false
-    }
+    },
+    // Enhanced fields for Optimizer
+    timeWindow: {
+        start: { type: String, required: true }, // e.g., "08:30"
+        end: { type: String, required: true }   // e.g., "09:00"
+    },
+    isRecurring: {
+        type: Boolean,
+        default: false
+    },
+    recurringDays: [{
+        type: String,
+        enum: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    }],
+    statusHistory: [{
+        status: String,
+        timestamp: { type: Date, default: Date.now }
+    }]
 });
 
 module.exports = mongoose.model('RiderIntent', RiderIntentSchema);
